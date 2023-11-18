@@ -1,0 +1,5 @@
+max_clients=10
+num_pool_workers=5
+
+tcp_ip="localhost"
+tcp_port=":8081"
