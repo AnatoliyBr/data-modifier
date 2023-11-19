@@ -1,7 +1,10 @@
 package configs
 
 import (
+	"os"
+
 	"github.com/BurntSushi/toml"
+	"github.com/joho/godotenv"
 )
 
 type (
@@ -30,6 +33,18 @@ type (
 )
 
 func NewConfig(configPath string) (*Config, error) {
+	if err := godotenv.Load(); err != nil {
+		return nil, err
+	}
+
+	login := os.Getenv("LOGIN")
+	password := os.Getenv("PASSWORD")
+
+	if login == "" || password == "" {
+		login = "login"
+		password = "password"
+	}
+
 	config := &Config{
 		App: App{
 			MaxClients:     10,
@@ -38,6 +53,10 @@ func NewConfig(configPath string) (*Config, error) {
 		TCP: TCP{
 			IP:   "localhost",
 			Port: ":8080",
+		},
+		WebAPI: WebAPI{
+			Login:    login,
+			Password: password,
 		},
 	}
 

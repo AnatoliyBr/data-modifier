@@ -35,3 +35,7 @@ func (s *GRPCServer) Notify() <-chan error {
 func (s *GRPCServer) GracefulShutdown() {
 	s.server.GracefulStop()
 }
+
+func (s *GRPCServer) GetServer() *grpc.Server {
+	return s.server
+}

@@ -9,6 +9,8 @@ import (
 	"syscall"
 
 	"github.com/AnatoliyBr/data-modifier/configs"
+	v1 "github.com/AnatoliyBr/data-modifier/pkg/api/v1"
+	"github.com/AnatoliyBr/data-modifier/pkg/datamodifier"
 	"github.com/AnatoliyBr/data-modifier/pkg/grpcserver"
 	"golang.org/x/net/netutil"
 )
@@ -39,6 +41,21 @@ func Run() error {
 
 	l = netutil.LimitListener(l, config.App.MaxClients)
 	s := grpcserver.NewGRPCServer(config.App.NumPoolWorkers)
+
+	srv := &datamodifier.DataModifierService{WebAPI: struct {
+		IP       string
+		Port     string
+		Login    string
+		Password string
+	}{
+		IP:       config.WebAPI.IP,
+		Port:     config.WebAPI.Port,
+		Login:    config.WebAPI.Login,
+		Password: config.WebAPI.Password,
+	}}
+
+	v1.RegisterDataModifierServer(s.GetServer(), srv)
+
 	s.StartGRPCServer(l)
 
 	interrupt := make(chan os.Signal, 1)

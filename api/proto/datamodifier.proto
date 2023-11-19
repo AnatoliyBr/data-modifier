@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package datamodifier;
+
+option go_package = "/api/v1";
+
+service DataModifier {
+    rpc AddAbsenceStatus(SourceData) returns (ModifiedData) {}
+}
+
+message TimePeriod {
+    string date_from = 1;
+    string date_to = 2;
+}
+
+message UserData {
+    uint32 id = 1;
+    string display_name = 2;
+    string email = 3;
+    string mobile_phone = 4;
+    string work_phone = 5;
+}
+
+message SourceData {
+    UserData user_data = 1;
+    TimePeriod time_period = 2;
+}
+
+message ModifiedData {
+    UserData modified_user_data = 1;
+}
