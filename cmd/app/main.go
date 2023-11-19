@@ -1,7 +1,13 @@
 package main
 
-import "github.com/AnatoliyBr/data-modifier/internal/app"
+import (
+	"log"
+
+	"github.com/AnatoliyBr/data-modifier/internal/app"
+)
 
 func main() {
-	app.Run()
+	if err := app.Run(); err != nil {
+		log.Fatal(err)
+	}
 }

@@ -19,13 +19,12 @@ func init() {
 	flag.StringVar(&configPath, "config-path", "configs/config.toml", "path to config file")
 }
 
-func Run() {
-
+func Run() error {
 	// Config
 	flag.Parse()
 	config, err := configs.NewConfig(configPath)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// WebAPI
@@ -35,7 +34,7 @@ func Run() {
 	// Controller
 	l, err := net.Listen("tcp", config.TCP.IP+config.TCP.Port)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	l = netutil.LimitListener(l, config.App.MaxClients)
@@ -49,10 +48,12 @@ func Run() {
 	case signal := <-interrupt:
 		log.Print("app - Run - signal: " + signal.String())
 	case err = <-s.Notify():
-		log.Print("app - Run - GRPCServer.Notify: %w")
+		log.Print("app - Run - GRPCServer.Notify: %w", err)
 	}
 
 	// Shutdown
 	s.GracefulShutdown()
 	log.Print("app - Run - GRPCServer.GracefulShutdown")
+
+	return nil
 }

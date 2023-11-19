@@ -6,9 +6,9 @@ import (
 
 type (
 	Config struct {
-		App
 		TCP
 		WebAPI
+		App
 	}
 
 	App struct {

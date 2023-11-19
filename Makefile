@@ -6,4 +6,9 @@ build:
 test:
 				go test -v -race ./...
 
+.PHONY: linter
+linter:
+				golangci-lint run ./... --config=./.golangci.yml
+
+
 .DEFAULT_GOAL := build

@@ -13,4 +13,6 @@ go get google.golang.org/grpc
 go get google.golang.org/protobuf
 
 go get golang.org/x/net
+
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
 ```
