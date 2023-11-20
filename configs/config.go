@@ -11,6 +11,7 @@ type (
 	Config struct {
 		TCP
 		WebAPI
+		Logger
 		App
 	}
 
@@ -29,6 +30,12 @@ type (
 		Port     string `toml:"web_api_port"`
 		Login    string `toml:"login"`
 		Password string `toml:"password"`
+	}
+
+	Logger struct {
+		Format      string `toml:"log_format"`
+		Level       string `toml:"log_level"`
+		EncoderType string `toml:"encoder_type"`
 	}
 )
 
@@ -57,6 +64,10 @@ func NewConfig(configPath string) (*Config, error) {
 		WebAPI: WebAPI{
 			Login:    login,
 			Password: password,
+		},
+		Logger: Logger{
+			Level:  "debug",
+			Format: "console",
 		},
 	}
 

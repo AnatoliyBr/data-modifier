@@ -2,16 +2,18 @@ package app
 
 import (
 	"flag"
-	"log"
+	"fmt"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/AnatoliyBr/data-modifier/configs"
+	"github.com/AnatoliyBr/data-modifier/internal/controller/datamodifier"
 	v1 "github.com/AnatoliyBr/data-modifier/pkg/api/v1"
-	"github.com/AnatoliyBr/data-modifier/pkg/datamodifier"
 	"github.com/AnatoliyBr/data-modifier/pkg/grpcserver"
+	"github.com/AnatoliyBr/data-modifier/pkg/logger"
+	"go.uber.org/zap"
 	"golang.org/x/net/netutil"
 )
 
@@ -29,48 +31,53 @@ func Run() error {
 		return err
 	}
 
+	// Logger
+	log, err := logger.NewLogger(config.Logger.Format, config.Logger.Level, config.Logger.EncoderType)
+	defer log.Sync()
+
+	if err != nil {
+		return err
+	}
+
+	restore := zap.ReplaceGlobals(log)
+	defer restore()
+
 	// WebAPI
 
-	// UseCase ?
+	// UseCase
 
 	// Controller
+	srv := &datamodifier.DataModifierService{}
+
+	// GRPC server
+	zap.L().Debug(fmt.Sprintf("Listen port: %s", config.TCP.Port))
 	l, err := net.Listen("tcp", config.TCP.IP+config.TCP.Port)
 	if err != nil {
 		return err
 	}
 
 	l = netutil.LimitListener(l, config.App.MaxClients)
-	s := grpcserver.NewGRPCServer(config.App.NumPoolWorkers)
 
-	srv := &datamodifier.DataModifierService{WebAPI: struct {
-		IP       string
-		Port     string
-		Login    string
-		Password string
-	}{
-		IP:       config.WebAPI.IP,
-		Port:     config.WebAPI.Port,
-		Login:    config.WebAPI.Login,
-		Password: config.WebAPI.Password,
-	}}
+	s := grpcserver.NewGRPCServer(config.App.NumPoolWorkers)
 
 	v1.RegisterDataModifierServer(s.GetServer(), srv)
 
 	s.StartGRPCServer(l)
 
+	// Waiting signal
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
 	select {
 	case signal := <-interrupt:
-		log.Print("app - Run - signal: " + signal.String())
+		zap.L().Info("app - Run - signal: " + signal.String())
 	case err = <-s.Notify():
-		log.Print("app - Run - GRPCServer.Notify: %w", err)
+		zap.L().Error("app - Run - GRPCServer.Notify: %w", zap.Error(err))
 	}
 
-	// Shutdown
+	// Graceful shutdown
 	s.GracefulShutdown()
-	log.Print("app - Run - GRPCServer.GracefulShutdown")
+	zap.L().Info("app - Run - GRPCServer.GracefulShutdown")
 
 	return nil
 }

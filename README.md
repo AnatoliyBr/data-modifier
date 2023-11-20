@@ -61,4 +61,11 @@ go get google.golang.org/grpc
 go get google.golang.org/protobuf
 
 protoc --proto_path=api/proto --go_out=pkg --go-grpc_out=pkg api/proto/adder.proto
+
+go get go.uber.org/zap
+go get github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery
+go get github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging
 ```
+
+## Полезные ссылки
+* [Пишем gRPC сервис на Go — сервис авторизации](https://habr.com/ru/articles/774796/)

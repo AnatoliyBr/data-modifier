@@ -7,16 +7,10 @@ import (
 )
 
 type DataModifierService struct {
-	WebAPI struct {
-		IP       string
-		Port     string
-		Login    string
-		Password string
-	}
 	v1.UnimplementedDataModifierServer
 }
 
-func (s *DataModifierService) AddAbsenceStatus(ctx context.Context, req *v1.SourceData) (*v1.ModifiedData, error) {
+func (s *DataModifierService) AddAbsenceStatus(_ context.Context, req *v1.SourceData) (*v1.ModifiedData, error) {
 	userData := req.GetUserData()
 
 	return &v1.ModifiedData{
