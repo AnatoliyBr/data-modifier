@@ -26,10 +26,11 @@ type (
 	}
 
 	WebAPI struct {
-		IP       string `toml:"web_api_ip"`
-		Port     string `toml:"web_api_port"`
-		Login    string `toml:"login"`
-		Password string `toml:"password"`
+		IP          string `toml:"web_api_ip"`
+		Port        string `toml:"web_api_port"`
+		Login       string `toml:"login"`
+		Password    string `toml:"password"`
+		AbsencePath string `toml:"absence_path"`
 	}
 
 	Logger struct {

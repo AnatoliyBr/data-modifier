@@ -65,6 +65,11 @@ protoc --proto_path=api/proto --go_out=pkg --go-grpc_out=pkg api/proto/adder.pro
 go get go.uber.org/zap
 go get github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery
 go get github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging
+
+go get github.com/go-ozzo/ozzo-validation
+go get github.com/go-ozzo/ozzo-validation/is
+
+go get github.com/stretchr/testify
 ```
 
 ## Полезные ссылки

@@ -22,5 +22,3 @@ func (s *DataModifierService) AddAbsenceStatus(_ context.Context, req *v1.Source
 			WorkPhone:   userData.WorkPhone,
 		}}, nil
 }
-
-func (s *DataModifierService) mustEmbedUnimplementedDataModifierServer() {}
