@@ -31,6 +31,7 @@ type (
 		Login       string `toml:"login"`
 		Password    string `toml:"password"`
 		AbsencePath string `toml:"absence_path"`
+		AuthPath    string `toml:"auth_path"`
 	}
 
 	Logger struct {

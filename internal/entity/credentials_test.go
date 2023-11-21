@@ -39,10 +39,19 @@ func TestCredentials_Validate(t *testing.T) {
 			isValid: false,
 		},
 		{
-			name: "invalid url",
+			name: "invalid absence url",
 			c: func() *entity.Credentials {
 				c := entity.TestCredentials()
 				c.AbsenceURL = "invalid"
+				return c
+			},
+			isValid: false,
+		},
+		{
+			name: "invalid auth url",
+			c: func() *entity.Credentials {
+				c := entity.TestCredentials()
+				c.AuthURL = "invalid"
 				return c
 			},
 			isValid: false,

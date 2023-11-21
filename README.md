@@ -70,6 +70,8 @@ go get github.com/go-ozzo/ozzo-validation
 go get github.com/go-ozzo/ozzo-validation/is
 
 go get github.com/stretchr/testify
+
+go get github.com/golang-jwt/jwt/v5
 ```
 
 ## Полезные ссылки

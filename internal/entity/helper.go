@@ -17,5 +17,6 @@ func TestCredentials() *Credentials {
 		Login:      "admin",
 		Password:   "password",
 		AbsenceURL: "https://127.0.0.1:8080/Portal/springApi/api/absences",
+		AuthURL:    "https://127.0.0.1:8080/tokens",
 	}
 }

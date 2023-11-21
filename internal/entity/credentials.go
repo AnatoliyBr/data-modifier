@@ -13,6 +13,7 @@ type Credentials struct {
 	Login      string
 	Password   string
 	AbsenceURL string
+	AuthURL    string
 }
 
 func (c *Credentials) Validate() error {
@@ -23,5 +24,6 @@ func (c *Credentials) Validate() error {
 		validation.Field(&c.Login, validation.Required, validation.Match(regexp.MustCompile(`^[\w]+$`))),
 		validation.Field(&c.Password, validation.Required, validation.Length(6, 20)),
 		validation.Field(&c.AbsenceURL, validation.Required, is.URL),
+		validation.Field(&c.AuthURL, validation.Required, is.URL),
 	)
 }
