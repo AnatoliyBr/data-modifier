@@ -2,6 +2,7 @@ package webapi
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -11,26 +12,39 @@ import (
 )
 
 type UserWebAPI struct {
-	Credentials *entity.Credentials
-	Token       string
+	Credentials    *entity.Credentials
+	BasicAuthToken string
 }
 
 func NewUserWebAPI(c *entity.Credentials) *UserWebAPI {
-	return &UserWebAPI{
+	a := &UserWebAPI{
 		Credentials: &entity.Credentials{
-			IP:         c.IP,
-			Port:       c.Port,
-			Login:      c.Login,
-			Password:   c.Password,
-			AbsenceURL: c.AbsenceURL,
-			AuthURL:    c.AuthURL,
+			IP:          c.IP,
+			Port:        c.Port,
+			Login:       c.Login,
+			Password:    c.Password,
+			EmployeeURL: c.EmployeeURL,
+			AbsenceURL:  c.AbsenceURL,
 		}}
+
+	a.basicAuth()
+
+	return a
 }
 
-func (a *UserWebAPI) Authenticate() error {
+func (a *UserWebAPI) basicAuth() {
+	a.BasicAuthToken = base64.StdEncoding.EncodeToString(
+		[]byte(a.Credentials.Login + ":" + a.Credentials.Password))
+}
+
+func (a *UserWebAPI) GetUserID(u *entity.User) error {
 	payload := map[string]string{
-		"login":    a.Credentials.Login,
-		"password": a.Credentials.Password,
+		"email": u.Email,
+	}
+
+	type response struct {
+		Status string         `json:"status"`
+		Data   []*entity.User `json:"data"`
 	}
 
 	b := &bytes.Buffer{}
@@ -38,22 +52,33 @@ func (a *UserWebAPI) Authenticate() error {
 		return err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, a.Credentials.AuthURL, b)
+	req, err := http.NewRequest(http.MethodPost, a.Credentials.EmployeeURL, b)
 	if err != nil {
 		return err
 	}
+
+	req.Header.Add("Authorization", "Basic "+a.BasicAuthToken)
 
 	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
+	r, err := client.Do(req)
 	if err != nil {
 		return err
 	}
 
-	a.Token = resp.Header["Set-Cookie"][0]
-
-	if a.Token == "" {
-		return errors.New("empty header")
+	resp := &response{}
+	if err := json.NewDecoder(r.Body).Decode(resp); err != nil {
+		return err
 	}
 
+	if resp.Status != "OK" {
+		return errors.New("not found")
+	}
+
+	u.ID = resp.Data[0].ID
+
+	return nil
+}
+
+func (a *UserWebAPI) AddAbsenceStatus(u *entity.User, p [2]time.Time) error {
 	return nil
 }

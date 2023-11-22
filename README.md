@@ -18,7 +18,6 @@ Data Modifier - gRPC-сервер для расширения/модификац
 ```json
 {
     "user_data": {
-        "id": 123,
         "display_name": "Иванов Семен Петрович",
         "email": "petrovich@mail.ru",
         "mobile_phone": "+71234567890",
@@ -37,7 +36,6 @@ Data Modifier - gRPC-сервер для расширения/модификац
 ```json
 {
     "modified_user_data": {
-        "id": 123,
         "display_name": "Иванов Семен Петрович",
         "email": "petrovich@mail.ru",
         "mobile_phone": "+71234567890",
@@ -57,10 +55,7 @@ go get golang.org/x/net
 
 curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
 
-go get google.golang.org/grpc
-go get google.golang.org/protobuf
-
-protoc --proto_path=api/proto --go_out=pkg --go-grpc_out=pkg api/proto/adder.proto
+protoc --proto_path=api/proto --go_out=pkg --go-grpc_out=pkg api/proto/datamodifier.proto
 
 go get go.uber.org/zap
 go get github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery
@@ -70,8 +65,6 @@ go get github.com/go-ozzo/ozzo-validation
 go get github.com/go-ozzo/ozzo-validation/is
 
 go get github.com/stretchr/testify
-
-go get github.com/golang-jwt/jwt/v5
 ```
 
 ## Полезные ссылки

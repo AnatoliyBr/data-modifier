@@ -8,11 +8,11 @@ import (
 )
 
 type User struct {
-	DisplayName string
-	Email       string
-	MobilePhone string
-	WorkPhone   string
-	ID          uint32
+	DisplayName string `json:"displayName,omitempty"`
+	Email       string `json:"email,omitempty"`
+	MobilePhone string `json:"mobilePhone,omitempty"`
+	WorkPhone   string `json:"workPhone,omitempty"`
+	ID          int    `json:"id,omitempty"`
 }
 
 func (u *User) Validate() error {
@@ -35,8 +35,5 @@ func (u *User) Validate() error {
 			&u.WorkPhone,
 			validation.Required,
 			validation.Match(regexp.MustCompile(`^\+\d+$|^\d+$`)), validation.Length(1, 12)),
-		validation.Field(
-			&u.ID,
-			validation.Required),
 	)
 }

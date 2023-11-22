@@ -15,7 +15,6 @@ func (s *DataModifierService) AddAbsenceStatus(_ context.Context, req *v1.Source
 
 	return &v1.ModifiedData{
 		ModifiedUserData: &v1.UserData{
-			Id:          userData.Id,
 			DisplayName: userData.DisplayName,
 			Email:       userData.Email,
 			MobilePhone: userData.MobilePhone,

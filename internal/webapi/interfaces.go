@@ -1,8 +1,12 @@
 package webapi
 
-import "github.com/AnatoliyBr/data-modifier/internal/entity"
+import (
+	"time"
+
+	"github.com/AnatoliyBr/data-modifier/internal/entity"
+)
 
 type WebAPI interface {
-	Authenticate() error
-	AddAbsenceStatus(*entity.User) (*entity.User, error)
+	GetUserID(*entity.User) error
+	AddAbsenceStatus(*entity.User, [2]time.Time) error
 }
