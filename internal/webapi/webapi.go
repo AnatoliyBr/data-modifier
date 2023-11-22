@@ -12,8 +12,9 @@ import (
 )
 
 type UserWebAPI struct {
-	Credentials    *entity.Credentials
-	BasicAuthToken string
+	Credentials        *entity.Credentials
+	AbsencesReasonList map[int]*entity.Reason
+	BasicAuthToken     string
 }
 
 func NewUserWebAPI(c *entity.Credentials) *UserWebAPI {
@@ -25,7 +26,8 @@ func NewUserWebAPI(c *entity.Credentials) *UserWebAPI {
 			Password:    c.Password,
 			EmployeeURL: c.EmployeeURL,
 			AbsenceURL:  c.AbsenceURL,
-		}}
+		},
+		AbsencesReasonList: entity.ReasonList}
 
 	a.basicAuth()
 
@@ -79,6 +81,57 @@ func (a *UserWebAPI) GetUserID(u *entity.User) error {
 	return nil
 }
 
-func (a *UserWebAPI) AddAbsenceStatus(u *entity.User, p [2]time.Time) error {
+func (a *UserWebAPI) AddAbsenceStatus(u *entity.User, p [2]entity.CustomTime) error {
+	type absenceRequest struct {
+		DateFrom   entity.CustomTime `json:"dateFrom"`
+		DateTo     entity.CustomTime `json:"dateTo"`
+		PersonsIDs []int             `json:"personsIds"`
+	}
+
+	payload := &absenceRequest{
+		PersonsIDs: []int{u.ID},
+		DateFrom:   p[0],
+		DateTo:     p[1],
+	}
+
+	type response struct {
+		Status string                    `json:"status"`
+		Data   []*entity.UserAbsenceData `json:"data"`
+	}
+
+	b := &bytes.Buffer{}
+	if err := json.NewEncoder(b).Encode(payload); err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, a.Credentials.AbsenceURL, b)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Authorization", "Basic "+a.BasicAuthToken)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	r, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	resp := &response{}
+	if err := json.NewDecoder(r.Body).Decode(resp); err != nil {
+		return err
+	}
+
+	if resp.Status != "OK" {
+		return errors.New("not found")
+	}
+
+	if _, ok := a.AbsencesReasonList[resp.Data[0].ReasonID]; !ok {
+		return errors.New("not found")
+	}
+
+	e := a.AbsencesReasonList[resp.Data[0].ReasonID].Emoji
+	u.DisplayName = u.DisplayName + " " + e
+
 	return nil
 }

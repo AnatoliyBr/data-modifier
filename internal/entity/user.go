@@ -15,6 +15,15 @@ type User struct {
 	ID          int    `json:"id,omitempty"`
 }
 
+type UserAbsenceData struct {
+	CreatedDate CustomDate `json:"createdDate,omitempty"`
+	DateFrom    CustomTime `json:"dateFrom,omitempty"`
+	DateTo      CustomTime `json:"dateTo,omitempty"`
+	ID          int        `json:"id,omitempty"`
+	PersonID    int        `json:"personId,omitempty"`
+	ReasonID    int        `json:"reasonId,omitempty"`
+}
+
 func (u *User) Validate() error {
 	return validation.ValidateStruct(
 		u,

@@ -1,5 +1,7 @@
 package entity
 
+import "time"
+
 func TestUser() *User {
 	return &User{
 		DisplayName: "Иванов Семен Петрович",
@@ -7,6 +9,21 @@ func TestUser() *User {
 		MobilePhone: "+71234567890",
 		WorkPhone:   "1234",
 		ID:          1234,
+	}
+}
+
+func TestUserAbsenceData() *UserAbsenceData {
+	createdDate, _ := time.Parse("2006-01-02", "2023-08-14")
+	dateFrom, _ := time.Parse("2006-01-02T15:04:05", "2023-08-12T00:00:00")
+	dateTo, _ := time.Parse("2006-01-02T15:04:05", "2023-08-12T23:59:59")
+
+	return &UserAbsenceData{
+		CreatedDate: CustomDate{Time: createdDate},
+		DateFrom:    CustomTime{Time: dateFrom},
+		DateTo:      CustomTime{Time: dateTo},
+		ID:          28246,
+		PersonID:    1234,
+		ReasonID:    1,
 	}
 }
 
