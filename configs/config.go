@@ -26,12 +26,12 @@ type (
 	}
 
 	WebAPI struct {
-		IP          string `toml:"web_api_ip"`
-		Port        string `toml:"web_api_port"`
-		Login       string `toml:"login"`
-		Password    string `toml:"password"`
-		AbsencePath string `toml:"absence_path"`
-		AuthPath    string `toml:"auth_path"`
+		IP           string `toml:"web_api_ip"`
+		Port         string `toml:"web_api_port"`
+		Login        string `toml:"login"`
+		Password     string `toml:"password"`
+		EmployeePath string `toml:"employee_path"`
+		AbsencePath  string `toml:"absence_path"`
 	}
 
 	Logger struct {
@@ -64,8 +64,12 @@ func NewConfig(configPath string) (*Config, error) {
 			Port: ":8080",
 		},
 		WebAPI: WebAPI{
-			Login:    login,
-			Password: password,
+			IP:           "localhost",
+			Port:         ":8082",
+			Login:        login,
+			Password:     password,
+			EmployeePath: "Portal/springApi/api/employees",
+			AbsencePath:  "Portal/springApi/api/absences",
 		},
 		Logger: Logger{
 			Level:  "debug",

@@ -66,8 +66,17 @@ func (s *GRPCServer) GetServer() *grpc.Server {
 func InterceptorLogger(l *zap.Logger) logging.Logger {
 	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
 		convertLevel := zapcore.Level(lvl / 4)
-		convertFields := zap.Any("fields", fields)
 
-		l.Log(convertLevel, msg, convertFields)
+		metadata := make(map[string]string, (len(fields)-2)/2)
+		for i := 0; i < len(fields)-3; i = i + 2 {
+			metadata[fields[i].(string)] = fields[i+1].(string)
+		}
+
+		traffic := fields[len(fields)-1]
+
+		convertMetadata := zap.Any("metadata", metadata)
+		convertTraffic := zap.Any("traffic", traffic)
+
+		l.Log(convertLevel, msg, convertMetadata, convertTraffic)
 	})
 }

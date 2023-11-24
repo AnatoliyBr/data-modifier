@@ -10,6 +10,9 @@ import (
 
 	"github.com/AnatoliyBr/data-modifier/configs"
 	"github.com/AnatoliyBr/data-modifier/internal/controller/datamodifier"
+	"github.com/AnatoliyBr/data-modifier/internal/entity"
+	"github.com/AnatoliyBr/data-modifier/internal/usecase"
+	"github.com/AnatoliyBr/data-modifier/internal/webapi"
 	v1 "github.com/AnatoliyBr/data-modifier/pkg/api/v1"
 	"github.com/AnatoliyBr/data-modifier/pkg/grpcserver"
 	"github.com/AnatoliyBr/data-modifier/pkg/logger"
@@ -26,13 +29,16 @@ func init() {
 func Run() error {
 	// Config
 	flag.Parse()
-	config, err := configs.NewConfig(configPath)
+	cfg, err := configs.NewConfig(configPath)
 	if err != nil {
 		return err
 	}
 
 	// Logger
-	log, err := logger.NewLogger(config.Logger.Format, config.Logger.Level, config.Logger.EncoderType)
+	log, err := logger.NewLogger(
+		cfg.Logger.Format,
+		cfg.Logger.Level,
+		cfg.Logger.EncoderType)
 	defer log.Sync()
 
 	if err != nil {
@@ -43,30 +49,56 @@ func Run() error {
 	defer restore()
 
 	// WebAPI
-	//webAPI := webapi.NewUserWebAPI(entity.TestCredentials())
+	zap.L().Info("Initializing UserWebAPI...")
+	cred := &entity.Credentials{
+		IP:       cfg.WebAPI.IP,
+		Port:     cfg.WebAPI.Port,
+		Login:    cfg.WebAPI.Login,
+		Password: cfg.WebAPI.Password,
+		EmployeeURL: fmt.Sprintf("https://%s%s/%s",
+			cfg.WebAPI.IP,
+			cfg.WebAPI.Port,
+			cfg.WebAPI.EmployeePath),
+		AbsenceURL: fmt.Sprintf("https://%s%s/%s",
+			cfg.WebAPI.IP,
+			cfg.WebAPI.Port,
+			cfg.WebAPI.AbsencePath),
+	}
+
+	if err = cred.Validate(); err != nil {
+		return err
+	}
+
+	webAPI := webapi.NewUserWebAPI(cred)
 
 	// UseCase
-	//uc := usecase.NewAppUseCase(webAPI)
+	zap.L().Info("Initializing AppUseCase...")
+	uc := usecase.NewAppUseCase(webAPI)
 
 	// Controller
-	srv := &datamodifier.DataModifierService{}
+	zap.L().Info("Initializing NewDataModifierService...")
+	src := datamodifier.NewDataModifierService(uc)
 
 	// GRPC server
-	zap.L().Debug(fmt.Sprintf("Listen port: %s", config.TCP.Port))
-	l, err := net.Listen("tcp", config.TCP.IP+config.TCP.Port)
+	zap.L().Info("Initializing GRPCServer...")
+	zap.L().Debug(fmt.Sprintf("Listen %s%s", cfg.TCP.IP, cfg.TCP.Port))
+	l, err := net.Listen("tcp", cfg.TCP.IP+cfg.TCP.Port)
 	if err != nil {
 		return err
 	}
 
-	l = netutil.LimitListener(l, config.App.MaxClients)
+	zap.L().Debug(fmt.Sprintf("MaxClients: %d", cfg.App.MaxClients))
+	l = netutil.LimitListener(l, cfg.App.MaxClients)
 
-	s := grpcserver.NewGRPCServer(config.App.NumPoolWorkers)
+	zap.L().Debug(fmt.Sprintf("NumPoolWorkers: %d", cfg.App.NumPoolWorkers))
+	s := grpcserver.NewGRPCServer(cfg.App.NumPoolWorkers)
 
-	v1.RegisterDataModifierServer(s.GetServer(), srv)
+	v1.RegisterDataModifierServer(s.GetServer(), src)
 
 	s.StartGRPCServer(l)
 
 	// Waiting signal
+	zap.L().Info("Configuring graceful shutdown...")
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
@@ -78,8 +110,8 @@ func Run() error {
 	}
 
 	// Graceful shutdown
+	zap.L().Info("Shutting down...")
 	s.GracefulShutdown()
-	zap.L().Info("app - Run - GRPCServer.GracefulShutdown")
 
 	return nil
 }
