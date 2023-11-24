@@ -43,8 +43,10 @@ func Run() error {
 	defer restore()
 
 	// WebAPI
+	//webAPI := webapi.NewUserWebAPI(entity.TestCredentials())
 
 	// UseCase
+	//uc := usecase.NewAppUseCase(webAPI)
 
 	// Controller
 	srv := &datamodifier.DataModifierService{}
