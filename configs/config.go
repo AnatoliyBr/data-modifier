@@ -30,6 +30,7 @@ type (
 		Port         string `toml:"web_api_port"`
 		Login        string `toml:"login"`
 		Password     string `toml:"password"`
+		ProtocolType string `toml:"protocol_type"`
 		EmployeePath string `toml:"employee_path"`
 		AbsencePath  string `toml:"absence_path"`
 	}
@@ -60,20 +61,22 @@ func NewConfig(configPath string) (*Config, error) {
 			NumPoolWorkers: 5,
 		},
 		TCP: TCP{
-			IP:   "localhost",
-			Port: ":8080",
+			IP:   "127.0.0.1",
+			Port: ":8081",
 		},
 		WebAPI: WebAPI{
-			IP:           "localhost",
+			IP:           "127.0.0.1",
 			Port:         ":8082",
 			Login:        login,
 			Password:     password,
+			ProtocolType: "http",
 			EmployeePath: "Portal/springApi/api/employees",
 			AbsencePath:  "Portal/springApi/api/absences",
 		},
 		Logger: Logger{
-			Level:  "debug",
-			Format: "console",
+			Level:       "debug",
+			Format:      "console",
+			EncoderType: "dev",
 		},
 	}
 

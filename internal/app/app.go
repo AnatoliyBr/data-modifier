@@ -16,6 +16,7 @@ import (
 	v1 "github.com/AnatoliyBr/data-modifier/pkg/api/v1"
 	"github.com/AnatoliyBr/data-modifier/pkg/grpcserver"
 	"github.com/AnatoliyBr/data-modifier/pkg/logger"
+	"github.com/AnatoliyBr/data-modifier/pkg/testserver"
 	"go.uber.org/zap"
 	"golang.org/x/net/netutil"
 )
@@ -55,11 +56,13 @@ func Run() error {
 		Port:     cfg.WebAPI.Port,
 		Login:    cfg.WebAPI.Login,
 		Password: cfg.WebAPI.Password,
-		EmployeeURL: fmt.Sprintf("https://%s%s/%s",
+		EmployeeURL: fmt.Sprintf("%s://%s%s/%s",
+			cfg.WebAPI.ProtocolType,
 			cfg.WebAPI.IP,
 			cfg.WebAPI.Port,
 			cfg.WebAPI.EmployeePath),
-		AbsenceURL: fmt.Sprintf("https://%s%s/%s",
+		AbsenceURL: fmt.Sprintf("%s://%s%s/%s",
+			cfg.WebAPI.ProtocolType,
 			cfg.WebAPI.IP,
 			cfg.WebAPI.Port,
 			cfg.WebAPI.AbsencePath),
@@ -71,6 +74,20 @@ func Run() error {
 
 	webAPI := webapi.NewUserWebAPI(cred)
 
+	// TestServer
+	ts := testserver.NewTestServer(
+		cfg.WebAPI.EmployeePath,
+		cfg.WebAPI.AbsencePath,
+		cfg.WebAPI.Port,
+		webAPI.BasicAuthToken,
+		entity.TestUser(),
+	)
+
+	zap.L().Debug(fmt.Sprintf("Starting TestServer on port %s", cfg.WebAPI.Port))
+	go func() error {
+		return ts.StartTestServer()
+	}()
+
 	// UseCase
 	zap.L().Info("Initializing AppUseCase...")
 	uc := usecase.NewAppUseCase(webAPI)
@@ -81,7 +98,6 @@ func Run() error {
 
 	// GRPC server
 	zap.L().Info("Initializing GRPCServer...")
-	zap.L().Debug(fmt.Sprintf("Listen %s%s", cfg.TCP.IP, cfg.TCP.Port))
 	l, err := net.Listen("tcp", cfg.TCP.IP+cfg.TCP.Port)
 	if err != nil {
 		return err
@@ -95,6 +111,7 @@ func Run() error {
 
 	v1.RegisterDataModifierServer(s.GetServer(), src)
 
+	zap.L().Debug(fmt.Sprintf("Starting GRPCServer on port %s", cfg.TCP.Port))
 	s.StartGRPCServer(l)
 
 	// Waiting signal

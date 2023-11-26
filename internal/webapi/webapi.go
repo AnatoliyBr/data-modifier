@@ -40,8 +40,12 @@ func (a *UserWebAPI) basicAuth() {
 }
 
 func (a *UserWebAPI) GetUserID(u *entity.User) error {
-	payload := map[string]string{
-		"email": u.Email,
+	type request struct {
+		Email string `json:"email"`
+	}
+
+	payload := &request{
+		Email: u.Email,
 	}
 
 	type response struct {

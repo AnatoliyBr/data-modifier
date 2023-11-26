@@ -70,6 +70,8 @@ go install go.uber.org/mock/mockgen
 go get go.uber.org/mock/mockgen
 
 mockgen -source=./internal/webapi/interfaces.go -destination=./internal/webapi/webapi_mocks.go -package=webapi
+
+go get github.com/gorilla/mux
 ```
 
 ## Полезные ссылки

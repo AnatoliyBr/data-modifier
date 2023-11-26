@@ -47,18 +47,18 @@ func (s *DataModifierService) AddAbsenceStatus(_ context.Context, req *v1.Source
 		return nil, status.Error(codes.InvalidArgument, "invalid time period")
 	}
 
-	p := [2]entity.CustomTime{
-		{Time: from},
-		{Time: to},
-	}
+	// p := [2]entity.CustomTime{
+	// 	{Time: from},
+	// 	{Time: to},
+	// }
 
 	if err := s.uc.GetUserID(u); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if err := s.uc.AddAbsenceStatus(u, p); err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	// if err := s.uc.AddAbsenceStatus(u, p); err != nil {
+	// 	return nil, status.Error(codes.Internal, err.Error())
+	// }
 
 	return &v1.ModifiedData{
 		ModifiedUserData: &v1.UserData{

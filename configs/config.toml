@@ -1,15 +1,13 @@
 max_clients=10
 num_pool_workers=5
 
-tcp_ip="localhost"
+tcp_ip="127.0.0.1"
 tcp_port=":8081"
 
 web_api_ip="127.0.0.1"
 web_api_port=":8082"
-login="admin"
-password="password"
-employee_path="Portal/springApi/api/employees"
-absence_path="Portal/springApi/api/absences"
+employee_path="employees"
+absence_path="absences"
 
 log_format="console"
 log_level="debug"
