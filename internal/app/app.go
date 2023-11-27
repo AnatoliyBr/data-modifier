@@ -81,6 +81,7 @@ func Run() error {
 		cfg.WebAPI.Port,
 		webAPI.BasicAuthToken,
 		entity.TestUser(),
+		entity.TestUserAbsenceData(),
 	)
 
 	zap.L().Debug(fmt.Sprintf("Starting TestServer on port %s", cfg.WebAPI.Port))

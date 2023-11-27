@@ -86,13 +86,13 @@ func (a *UserWebAPI) GetUserID(u *entity.User) error {
 }
 
 func (a *UserWebAPI) AddAbsenceStatus(u *entity.User, p [2]entity.CustomTime) error {
-	type absenceRequest struct {
+	type request struct {
 		DateFrom   entity.CustomTime `json:"dateFrom"`
 		DateTo     entity.CustomTime `json:"dateTo"`
 		PersonsIDs []int             `json:"personsIds"`
 	}
 
-	payload := &absenceRequest{
+	payload := &request{
 		PersonsIDs: []int{u.ID},
 		DateFrom:   p[0],
 		DateTo:     p[1],
@@ -130,11 +130,12 @@ func (a *UserWebAPI) AddAbsenceStatus(u *entity.User, p [2]entity.CustomTime) er
 		return errors.New("not found")
 	}
 
-	if _, ok := a.AbsencesReasonList[resp.Data[0].ReasonID]; !ok {
-		return errors.New("not found")
+	e := "❓"
+
+	if _, ok := a.AbsencesReasonList[resp.Data[0].ReasonID]; ok {
+		e = a.AbsencesReasonList[resp.Data[0].ReasonID].Emoji
 	}
 
-	e := a.AbsencesReasonList[resp.Data[0].ReasonID].Emoji
 	u.DisplayName = u.DisplayName + " " + e
 
 	return nil

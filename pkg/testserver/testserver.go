@@ -16,16 +16,18 @@ type TestServer struct {
 	port           string
 	basicAuthToken string
 	u              *entity.User
+	absenceData    *entity.UserAbsenceData
 	r              *mux.Router
 }
 
-func NewTestServer(employeePath, absencePath, port, token string, u *entity.User) *TestServer {
+func NewTestServer(employeePath, absencePath, port, token string, u *entity.User, ad *entity.UserAbsenceData) *TestServer {
 	s := &TestServer{
 		employeePath:   employeePath,
 		absencePath:    absencePath,
 		port:           port,
 		basicAuthToken: token,
 		u:              u,
+		absenceData:    ad,
 		r:              mux.NewRouter(),
 	}
 
@@ -94,8 +96,51 @@ func (s *TestServer) handleGetUserID() http.HandlerFunc {
 }
 
 func (s *TestServer) handleAddAbsenceStatus() http.HandlerFunc {
+	type request struct {
+		PersonsIDs []int             `json:"personsIds"`
+		DateFrom   entity.CustomTime `json:"dateFrom"`
+		DateTo     entity.CustomTime `json:"dateTo"`
+	}
+
+	type response struct {
+		Status string                    `json:"status"`
+		Data   []*entity.UserAbsenceData `json:"data"`
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		// TODO
+		authHeader, ok := r.Header["Authorization"]
+		if !ok {
+			s.error(w, r, http.StatusBadRequest, errors.New("incorrect auth header"))
+			return
+		}
+
+		authHeaderParts := strings.Split(authHeader[0], " ")
+		if len(authHeaderParts) != 2 || authHeaderParts[0] != "Basic" || authHeaderParts[1] == "" {
+			s.error(w, r, http.StatusBadRequest, errors.New("incorrect auth header"))
+			return
+		}
+
+		if authHeaderParts[1] != s.basicAuthToken {
+			s.error(w, r, http.StatusUnauthorized, errors.New("not authenticate"))
+			return
+		}
+
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		if req.PersonsIDs[0] == s.u.ID {
+			w.WriteHeader(http.StatusOK)
+			resp := &response{
+				Status: "OK",
+				Data:   []*entity.UserAbsenceData{s.absenceData},
+			}
+			s.respond(w, r, http.StatusOK, resp)
+		} else {
+			s.error(w, r, http.StatusNotFound, errors.New("status info not found"))
+		}
 	}
 }
 

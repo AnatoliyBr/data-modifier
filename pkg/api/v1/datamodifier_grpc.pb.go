@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DataModifierClient interface {
+	// AddAbsenceStatus allows to add an absence status to the user name.
 	AddAbsenceStatus(ctx context.Context, in *SourceData, opts ...grpc.CallOption) (*ModifiedData, error)
 }
 
@@ -46,6 +47,7 @@ func (c *dataModifierClient) AddAbsenceStatus(ctx context.Context, in *SourceDat
 // All implementations must embed UnimplementedDataModifierServer
 // for forward compatibility
 type DataModifierServer interface {
+	// AddAbsenceStatus allows to add an absence status to the user name.
 	AddAbsenceStatus(context.Context, *SourceData) (*ModifiedData, error)
 	mustEmbedUnimplementedDataModifierServer()
 }

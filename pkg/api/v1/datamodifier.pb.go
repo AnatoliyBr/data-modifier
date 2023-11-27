@@ -20,13 +20,17 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// A TimePeriod is a time interval of the search.
+// Default time format is "2006-01-02T15:04:05".
 type TimePeriod struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Start timestamp.
 	DateFrom string `protobuf:"bytes,1,opt,name=date_from,json=dateFrom,proto3" json:"date_from,omitempty"`
-	DateTo   string `protobuf:"bytes,2,opt,name=date_to,json=dateTo,proto3" json:"date_to,omitempty"`
+	// Stop timestamp.
+	DateTo string `protobuf:"bytes,2,opt,name=date_to,json=dateTo,proto3" json:"date_to,omitempty"`
 }
 
 func (x *TimePeriod) Reset() {
@@ -75,15 +79,20 @@ func (x *TimePeriod) GetDateTo() string {
 	return ""
 }
 
+// A UserData contains information about the user.
 type UserData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Name.
 	DisplayName string `protobuf:"bytes,1,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
-	Email       string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	// Email.
+	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	// Mobile phone.
 	MobilePhone string `protobuf:"bytes,3,opt,name=mobile_phone,json=mobilePhone,proto3" json:"mobile_phone,omitempty"`
-	WorkPhone   string `protobuf:"bytes,4,opt,name=work_phone,json=workPhone,proto3" json:"work_phone,omitempty"`
+	// Work phone.
+	WorkPhone string `protobuf:"bytes,4,opt,name=work_phone,json=workPhone,proto3" json:"work_phone,omitempty"`
 }
 
 func (x *UserData) Reset() {
@@ -146,12 +155,16 @@ func (x *UserData) GetWorkPhone() string {
 	return ""
 }
 
+// SourceData defines the fields in a /DataModifier/AddAbsenceStatus
+// method request to adding an absence status to user data.
 type SourceData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserData   *UserData   `protobuf:"bytes,1,opt,name=user_data,json=userData,proto3" json:"user_data,omitempty"`
+	// User data
+	UserData *UserData `protobuf:"bytes,1,opt,name=user_data,json=userData,proto3" json:"user_data,omitempty"`
+	// Time period
 	TimePeriod *TimePeriod `protobuf:"bytes,2,opt,name=time_period,json=timePeriod,proto3" json:"time_period,omitempty"`
 }
 
@@ -201,6 +214,8 @@ func (x *SourceData) GetTimePeriod() *TimePeriod {
 	return nil
 }
 
+// ModifiedData defines the fields in a /DataModifier/AddAbsenceStatus
+// method response.
 type ModifiedData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

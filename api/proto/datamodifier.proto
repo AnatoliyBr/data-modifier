@@ -2,29 +2,48 @@ syntax = "proto3";
 
 package datamodifier;
 
+// This package defines the proto messages and RPC service exposed by gRPC for
+// expanding/modifying user data based on a third-party system.
 option go_package = "/api/v1";
 
+// The DataModifier service exposes functions to modifying user data.
 service DataModifier {
+    // AddAbsenceStatus allows to add an absence status to the user name.
     rpc AddAbsenceStatus(SourceData) returns (ModifiedData) {}
 }
 
+// A TimePeriod is a time interval of the search.
+// Default time format is "2006-01-02T15:04:05".
 message TimePeriod {
+    // Start timestamp.
     string date_from = 1;
+    // Stop timestamp.
     string date_to = 2;
 }
 
+// A UserData contains information about the user.
 message UserData {
+    // Name.
     string display_name = 1;
+    // Email.
     string email = 2;
+    // Mobile phone.
     string mobile_phone = 3;
+    // Work phone.
     string work_phone = 4;
 }
 
+// SourceData defines the fields in a /DataModifier/AddAbsenceStatus
+// method request to adding an absence status to user data.
 message SourceData {
+    // User data
     UserData user_data = 1;
+    // Time period
     TimePeriod time_period = 2;
 }
 
+// ModifiedData defines the fields in a /DataModifier/AddAbsenceStatus
+// method response.
 message ModifiedData {
     UserData modified_user_data = 1;
 }

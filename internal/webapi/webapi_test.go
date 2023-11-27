@@ -23,6 +23,11 @@ func TestAppWebAPI_GetUserID(t *testing.T) {
 			Email string `json:"email"`
 		}
 
+		type response struct {
+			Status string         `json:"status"`
+			Data   []*entity.User `json:"data"`
+		}
+
 		authHeader, ok := r.Header["Authorization"]
 		if !ok {
 			w.WriteHeader(http.StatusBadRequest)
@@ -46,10 +51,11 @@ func TestAppWebAPI_GetUserID(t *testing.T) {
 
 		if req.Email == u1.Email {
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"status": "OK",
-				"data":   []*entity.User{u1},
-			})
+			resp := &response{
+				Status: "OK",
+				Data:   []*entity.User{u1},
+			}
+			json.NewEncoder(w).Encode(resp)
 		}
 	}))
 	defer s.Close()
