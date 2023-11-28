@@ -2,6 +2,7 @@ package entity
 
 import "time"
 
+// TestUser returns the User entity initialized with valid data.
 func TestUser() *User {
 	return &User{
 		DisplayName: "Иванов Семен Петрович",
@@ -12,6 +13,8 @@ func TestUser() *User {
 	}
 }
 
+// TestUserAbsenceData returns the UserAbsenceData entity
+// initialized with valid data.
 func TestUserAbsenceData() *UserAbsenceData {
 	createdDate, _ := time.Parse("2006-01-02", "2023-08-14")
 	dateFrom, _ := time.Parse("2006-01-02T15:04:05", "2023-08-12T00:00:00")
@@ -27,6 +30,8 @@ func TestUserAbsenceData() *UserAbsenceData {
 	}
 }
 
+// TestCredentials returns the Credentials entity
+// initialized with valid data.
 func TestCredentials() *Credentials {
 	return &Credentials{
 		IP:          "127.0.0.1",

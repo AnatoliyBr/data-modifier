@@ -12,18 +12,22 @@ const (
 	productionEncoder  = "prod"
 )
 
-func NewLogger(logFormat, logLevel, encoderType string) (*zap.Logger, error) {
+// NewLogger returns zap.Logger with the given
+// logFormat ("json", "console"),
+// logLevel ("debug", "info", "warn", "error"),
+// encoderType ("dev", "prod"),
+// outputPaths (e.g. ["stdout"], ["stdout", "./tmp/logs/rpc_traffic.txt"]),
+// errorOutputPaths (e.g. ["stderr"], ["stderr", "./tmp/logs/rpc_traffic_errors.txt"]).
+func NewLogger(logFormat, logLevel, encoderType string, outputPaths []string, errorOutputPaths []string) (*zap.Logger, error) {
 	rawJSON := []byte(fmt.Sprintf(`{
-	"level": "%s",
 	"encoding": "%s",
-	"outputPaths": ["stdout"],
-	"errorOutputPaths": ["stderr"],
+	"level": "%s",
 	"encoderConfig": {
 		"messageKey": "message",
 	    "levelKey": "level",
 	    "levelEncoder": "lowercase"
 		}
-	}`, logLevel, logFormat))
+	}`, logFormat, logLevel))
 
 	var cfg zap.Config
 	if err := json.Unmarshal(rawJSON, &cfg); err != nil {
@@ -36,6 +40,9 @@ func NewLogger(logFormat, logLevel, encoderType string) (*zap.Logger, error) {
 	case productionEncoder:
 		cfg.EncoderConfig = zap.NewProductionEncoderConfig()
 	}
+
+	cfg.OutputPaths = outputPaths
+	cfg.ErrorOutputPaths = errorOutputPaths
 
 	return zap.Must(cfg.Build()), nil
 }

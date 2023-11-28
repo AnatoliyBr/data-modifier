@@ -45,5 +45,6 @@ message SourceData {
 // ModifiedData defines the fields in a /DataModifier/AddAbsenceStatus
 // method response.
 message ModifiedData {
+    // Modified user data
     UserData modified_user_data = 1;
 }

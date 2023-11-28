@@ -1,12 +1,14 @@
 package entity
 
-type Reason struct {
+// AbsenceReason wraps info about user absence reason.
+type AbsenceReason struct {
 	Description string
 	Emoji       string
 	ID          int
 }
 
-var ReasonList = map[int]*Reason{
+// ReasonList stores AbsenceReason in-memory.
+var ReasonList = map[int]*AbsenceReason{
 	1: {
 		ID:          1,
 		Description: "Личные дела",

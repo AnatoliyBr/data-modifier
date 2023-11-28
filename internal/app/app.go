@@ -1,3 +1,4 @@
+// Package app configures and runs application.
 package app
 
 import (
@@ -27,6 +28,7 @@ func init() {
 	flag.StringVar(&configPath, "config-path", "configs/config.toml", "path to config file")
 }
 
+// Run creates objects via constructors.
 func Run() error {
 	// Config
 	flag.Parse()
@@ -39,7 +41,9 @@ func Run() error {
 	log, err := logger.NewLogger(
 		cfg.Logger.Format,
 		cfg.Logger.Level,
-		cfg.Logger.EncoderType)
+		cfg.Logger.EncoderType,
+		cfg.Logger.OutputPath,
+		cfg.Logger.ErrorOutputPath)
 	defer log.Sync()
 
 	if err != nil {
@@ -99,20 +103,20 @@ func Run() error {
 
 	// GRPC server
 	zap.L().Info("Initializing GRPCServer...")
-	l, err := net.Listen("tcp", cfg.TCP.IP+cfg.TCP.Port)
+	l, err := net.Listen("tcp", cfg.GRPC.IP+cfg.GRPC.Port)
 	if err != nil {
 		return err
 	}
 
-	zap.L().Debug(fmt.Sprintf("MaxClients: %d", cfg.App.MaxClients))
-	l = netutil.LimitListener(l, cfg.App.MaxClients)
+	zap.L().Debug(fmt.Sprintf("MaxClients: %d", cfg.GRPC.MaxClients))
+	l = netutil.LimitListener(l, cfg.GRPC.MaxClients)
 
-	zap.L().Debug(fmt.Sprintf("NumPoolWorkers: %d", cfg.App.NumPoolWorkers))
-	s := grpcserver.NewGRPCServer(cfg.App.NumPoolWorkers)
+	zap.L().Debug(fmt.Sprintf("NumPoolWorkers: %d", cfg.GRPC.NumPoolWorkers))
+	s := grpcserver.NewGRPCServer(cfg.GRPC.NumPoolWorkers)
 
 	v1.RegisterDataModifierServer(s.GetServer(), src)
 
-	zap.L().Debug(fmt.Sprintf("Starting GRPCServer on port %s", cfg.TCP.Port))
+	zap.L().Debug(fmt.Sprintf("Starting GRPCServer on port %s", cfg.GRPC.Port))
 	s.StartGRPCServer(l)
 
 	// Waiting signal

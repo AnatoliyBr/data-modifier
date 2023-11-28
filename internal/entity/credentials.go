@@ -7,6 +7,8 @@ import (
 	"github.com/go-ozzo/ozzo-validation/is"
 )
 
+// Credentials contains info for authentication
+// and working with a third-party WebAPI.
 type Credentials struct {
 	IP          string
 	Port        string
@@ -16,6 +18,7 @@ type Credentials struct {
 	AbsenceURL  string
 }
 
+// Validate validates fields of the Credentials entity.
 func (c *Credentials) Validate() error {
 	return validation.ValidateStruct(
 		c,

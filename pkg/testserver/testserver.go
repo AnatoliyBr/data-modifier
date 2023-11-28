@@ -1,3 +1,4 @@
+// Package testserver implements HTTP server to test datamodifier service.
 package testserver
 
 import (
@@ -10,6 +11,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// TestServer represents a third-party WebAPI server
+// for testing datamodifier server.
 type TestServer struct {
 	employeePath   string
 	absencePath    string
@@ -20,6 +23,7 @@ type TestServer struct {
 	r              *mux.Router
 }
 
+// NewTestServer returns TestServer with configured routes.
 func NewTestServer(employeePath, absencePath, port, token string, u *entity.User, ad *entity.UserAbsenceData) *TestServer {
 	s := &TestServer{
 		employeePath:   employeePath,
@@ -36,19 +40,23 @@ func NewTestServer(employeePath, absencePath, port, token string, u *entity.User
 	return s
 }
 
+// configureRouter registers endpoints.
 func (s *TestServer) configureRouter() {
 	s.r.HandleFunc("/"+s.employeePath, s.handleGetUserID()).Methods(http.MethodPost)
 	s.r.HandleFunc("/"+s.absencePath, s.handleAddAbsenceStatus()).Methods(http.MethodPost)
 }
 
+// ServeHTTP handles request.
 func (s *TestServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.r.ServeHTTP(w, r)
 }
 
+// StartTestServer starts listen and handle requests.
 func (s *TestServer) StartTestServer() error {
 	return http.ListenAndServe(s.port, s)
 }
 
+// handleGetUserID handles endpoint for searching user id.
 func (s *TestServer) handleGetUserID() http.HandlerFunc {
 	type request struct {
 		Email string `json:"email"`
@@ -95,6 +103,7 @@ func (s *TestServer) handleGetUserID() http.HandlerFunc {
 	}
 }
 
+// handleAddAbsenceStatus handles endpoint for searching user absence status.
 func (s *TestServer) handleAddAbsenceStatus() http.HandlerFunc {
 	type request struct {
 		PersonsIDs []int             `json:"personsIds"`
@@ -144,10 +153,12 @@ func (s *TestServer) handleAddAbsenceStatus() http.HandlerFunc {
 	}
 }
 
+// error creates an error response.
 func (s *TestServer) error(w http.ResponseWriter, r *http.Request, code int, err error) {
 	s.respond(w, r, code, map[string]string{"error": err.Error()})
 }
 
+// respond creates a response with JSON body.
 func (s *TestServer) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
 	w.WriteHeader(code)
 	if data != nil {

@@ -1,3 +1,5 @@
+// Package datamodifier implements gRPC service
+// for modifying user data based on a third-party system.
 package datamodifier
 
 import (
@@ -15,17 +17,21 @@ const (
 	defaultTimeLayout = "2006-01-02T15:04:05"
 )
 
+// DataModifierService implements v1.DataModifierServer interface.
+// It handles RPC requests and calls UseCase methods.
 type DataModifierService struct {
 	v1.UnimplementedDataModifierServer
 	uc usecase.UseCase
 }
 
+// NewDataModifierService returns DataModifierService.
 func NewDataModifierService(uc usecase.UseCase) *DataModifierService {
 	return &DataModifierService{
 		uc: uc,
 	}
 }
 
+// AddAbsenceStatus adds an absence status to the user name.
 func (s *DataModifierService) AddAbsenceStatus(_ context.Context, req *v1.SourceData) (*v1.ModifiedData, error) {
 	userData := req.GetUserData()
 

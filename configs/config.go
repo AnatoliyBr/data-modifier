@@ -1,3 +1,4 @@
+// Package configs contains configuration structs.
 package configs
 
 import (
@@ -8,23 +9,22 @@ import (
 )
 
 type (
+	// Config contains configs of all app layers.
 	Config struct {
-		TCP
 		WebAPI
 		Logger
-		App
+		GRPC
 	}
 
-	App struct {
+	// GRPC contains info for gRPC server configuration.
+	GRPC struct {
+		IP             string `toml:"tcp_ip"`
+		Port           string `toml:"tcp_port"`
 		MaxClients     int    `toml:"max_clients"`
 		NumPoolWorkers uint32 `toml:"num_pool_workers"`
 	}
 
-	TCP struct {
-		IP   string `toml:"tcp_ip"`
-		Port string `toml:"tcp_port"`
-	}
-
+	// WebAPI contains info for WebAPI configuration.
 	WebAPI struct {
 		IP           string `toml:"web_api_ip"`
 		Port         string `toml:"web_api_port"`
@@ -35,13 +35,17 @@ type (
 		AbsencePath  string `toml:"absence_path"`
 	}
 
+	// Logger contains info for logger configuration.
 	Logger struct {
-		Format      string `toml:"log_format"`
-		Level       string `toml:"log_level"`
-		EncoderType string `toml:"encoder_type"`
+		Format          string   `toml:"log_format"`
+		Level           string   `toml:"log_level"`
+		EncoderType     string   `toml:"encoder_type"`
+		OutputPath      []string `toml:"output_path"`
+		ErrorOutputPath []string `toml:"error_output_path"`
 	}
 )
 
+// NewConfig returns app config.
 func NewConfig(configPath string) (*Config, error) {
 	if err := godotenv.Load(); err != nil {
 		return nil, err
@@ -56,13 +60,11 @@ func NewConfig(configPath string) (*Config, error) {
 	}
 
 	config := &Config{
-		App: App{
+		GRPC: GRPC{
+			IP:             "127.0.0.1",
+			Port:           ":8081",
 			MaxClients:     10,
 			NumPoolWorkers: 5,
-		},
-		TCP: TCP{
-			IP:   "127.0.0.1",
-			Port: ":8081",
 		},
 		WebAPI: WebAPI{
 			IP:           "127.0.0.1",
@@ -74,9 +76,11 @@ func NewConfig(configPath string) (*Config, error) {
 			AbsencePath:  "Portal/springApi/api/absences",
 		},
 		Logger: Logger{
-			Level:       "debug",
-			Format:      "console",
-			EncoderType: "dev",
+			Level:           "debug",
+			Format:          "console",
+			EncoderType:     "dev",
+			OutputPath:      []string{"stdout"},
+			ErrorOutputPath: []string{"stderr"},
 		},
 	}
 

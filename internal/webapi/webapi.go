@@ -11,12 +11,16 @@ import (
 	"github.com/AnatoliyBr/data-modifier/internal/entity"
 )
 
+// UserWebAPI implements WebAPI interface. It authenticates
+// and works with a certain WebAPI.
 type UserWebAPI struct {
 	Credentials        *entity.Credentials
-	AbsencesReasonList map[int]*entity.Reason
+	AbsencesReasonList map[int]*entity.AbsenceReason
 	BasicAuthToken     string
 }
 
+// NewUserWebAPI returns UserWebAPI entity and
+// generates token for HTTP Basic Auth.
 func NewUserWebAPI(c *entity.Credentials) *UserWebAPI {
 	a := &UserWebAPI{
 		Credentials: &entity.Credentials{
@@ -34,11 +38,13 @@ func NewUserWebAPI(c *entity.Credentials) *UserWebAPI {
 	return a
 }
 
+// basicAuth generates token for HTTP Basic Auth.
 func (a *UserWebAPI) basicAuth() {
 	a.BasicAuthToken = base64.StdEncoding.EncodeToString(
 		[]byte(a.Credentials.Login + ":" + a.Credentials.Password))
 }
 
+// GetUserID finds the user id on a specific WebAPI.
 func (a *UserWebAPI) GetUserID(u *entity.User) error {
 	type request struct {
 		Email string `json:"email"`
@@ -85,6 +91,8 @@ func (a *UserWebAPI) GetUserID(u *entity.User) error {
 	return nil
 }
 
+// AddAbsenceStatus finds user absence status info
+// for a time period p on a specific WebAPI and adds it to the user data.
 func (a *UserWebAPI) AddAbsenceStatus(u *entity.User, p [2]entity.CustomTime) error {
 	type request struct {
 		DateFrom   entity.CustomTime `json:"dateFrom"`

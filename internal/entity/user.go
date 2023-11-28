@@ -1,3 +1,5 @@
+// Package entity defines main entities for business logic (services), data base mapping and
+// HTTP response objects if suitable. Each logic group entities in own file.
 package entity
 
 import (
@@ -7,6 +9,7 @@ import (
 	"github.com/go-ozzo/ozzo-validation/is"
 )
 
+// User contains info about user.
 type User struct {
 	DisplayName string `json:"displayName,omitempty"`
 	Email       string `json:"email,omitempty"`
@@ -15,6 +18,8 @@ type User struct {
 	ID          int    `json:"id,omitempty"`
 }
 
+// UserAbsenceData represents user absence status
+// info from third-party WebAPI.
 type UserAbsenceData struct {
 	CreatedDate CustomDate `json:"createdDate,omitempty"`
 	DateFrom    CustomTime `json:"dateFrom,omitempty"`
@@ -24,6 +29,7 @@ type UserAbsenceData struct {
 	ReasonID    int        `json:"reasonId,omitempty"`
 }
 
+// Validate validates fields of the User entity.
 func (u *User) Validate() error {
 	return validation.ValidateStruct(
 		u,
