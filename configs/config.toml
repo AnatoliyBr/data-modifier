@@ -12,5 +12,5 @@ absence_path="absences"
 log_format="console"
 log_level="debug"
 encoder_type="dev"
-output_path=[ "stdout", "./tmp/logs/rpc_traffic.txt" ]
-error_output_path=[ "stderr", "./tmp/logs/rpc_traffic_errors.txt" ]
+output_path=[ "stdout" ]
+error_output_path=[ "stderr" ]

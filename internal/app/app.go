@@ -22,10 +22,14 @@ import (
 	"golang.org/x/net/netutil"
 )
 
-var configPath string
+var (
+	configPath string
+	testServer bool
+)
 
 func init() {
 	flag.StringVar(&configPath, "config-path", "configs/config.toml", "path to config file")
+	flag.BoolVar(&testServer, "test-server", false, "flag for starting test server")
 }
 
 // Run creates objects via constructors.
@@ -79,19 +83,21 @@ func Run() error {
 	webAPI := webapi.NewUserWebAPI(cred)
 
 	// TestServer
-	ts := testserver.NewTestServer(
-		cfg.WebAPI.EmployeePath,
-		cfg.WebAPI.AbsencePath,
-		cfg.WebAPI.Port,
-		webAPI.BasicAuthToken,
-		entity.TestUser(),
-		entity.TestUserAbsenceData(),
-	)
+	if testServer {
+		ts := testserver.NewTestServer(
+			cfg.WebAPI.EmployeePath,
+			cfg.WebAPI.AbsencePath,
+			cfg.WebAPI.Port,
+			webAPI.BasicAuthToken,
+			entity.TestUser(),
+			entity.TestUserAbsenceData(),
+		)
 
-	zap.L().Debug(fmt.Sprintf("Starting TestServer on port %s", cfg.WebAPI.Port))
-	go func() error {
-		return ts.StartTestServer()
-	}()
+		zap.L().Debug(fmt.Sprintf("Starting TestServer on port %s", cfg.WebAPI.Port))
+		go func() error {
+			return ts.StartTestServer()
+		}()
+	}
 
 	// UseCase
 	zap.L().Info("Initializing AppUseCase...")

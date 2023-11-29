@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 const (
@@ -19,6 +20,11 @@ const (
 // outputPaths (e.g. ["stdout"], ["stdout", "./tmp/logs/rpc_traffic.txt"]),
 // errorOutputPaths (e.g. ["stderr"], ["stderr", "./tmp/logs/rpc_traffic_errors.txt"]).
 func NewLogger(logFormat, logLevel, encoderType string, outputPaths []string, errorOutputPaths []string) (*zap.Logger, error) {
+	lvl, err := zapcore.ParseLevel(logLevel)
+	if err != nil {
+		return nil, err
+	}
+
 	rawJSON := []byte(fmt.Sprintf(`{
 	"encoding": "%s",
 	"level": "%s",
@@ -27,7 +33,7 @@ func NewLogger(logFormat, logLevel, encoderType string, outputPaths []string, er
 	    "levelKey": "level",
 	    "levelEncoder": "lowercase"
 		}
-	}`, logFormat, logLevel))
+	}`, logFormat, lvl))
 
 	var cfg zap.Config
 	if err := json.Unmarshal(rawJSON, &cfg); err != nil {
